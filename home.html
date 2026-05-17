@@ -3,281 +3,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lan-niTime 平台</title>
+    <title>Lan-niTime</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-        /* --- 保持你喜欢的极简渐变风格 --- */
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #fcfcfc; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
-        .app-container { width: 100%; max-width: 480px; padding: 20px; box-sizing: border-box; }
-        .logo-section { text-align: center; margin-bottom: 30px; }
-        .logo-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #43cea2, #185a9d, #f3904f); margin: 0 auto 15px; box-shadow: 0 8px 20px rgba(67, 206, 162, 0.3); }
-        .logo-text { font-size: 24px; font-weight: 300; background: linear-gradient(to right, #43cea2, #f3904f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* 登录/验证卡片 */
-        .auth-card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; box-sizing: border-box; border: 1px solid #eee; border-radius: 8px; font-size: 15px; outline: none; }
-        input:focus { border-color: #43cea2; }
-        button { width: 100%; padding: 12px; margin-top: 15px; background-color: #333; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
-        button:hover { background-color: #555; }
-        .toggle-link { margin-top: 15px; font-size: 13px; color: #666; cursor: pointer; text-decoration: underline; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+            font-weight: 600;
+        }
 
-        /* 主界面与项目卡片 */
-        #main-app { display: none; }
-        .project-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; }
-        .project-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #444; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .content-area { font-size: 14px; line-height: 1.6; color: #555; min-height: 20px; word-break: break-all; }
-        
-        /* 官方专属操作区 */
-        .admin-controls { display: none; margin-top: 15px; border-top: 1px dashed #eee; padding-top: 15px; background: #fafafa; padding: 10px; border-radius: 8px; }
-        .admin-btn { background-color: #43cea2; font-size: 13px; padding: 8px; margin-top: 8px; }
-        .admin-btn.orange { background-color: #f3904f; }
-        
-        /* 视频与链接样式 */
-        .video-item { margin-bottom: 20px; border-bottom: 1px solid #f9f9f9; padding-bottom: 15px; }
-        .video-title { font-weight: bold; margin-bottom: 8px; color: #333; font-size: 15px; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 8px; overflow: hidden; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .link-tag { display: inline-block; background: #f0f0f0; padding: 6px 12px; border-radius: 6px; margin: 4px 2px; font-size: 13px; color: #333; text-decoration: none; transition: 0.2s; }
-        .link-tag:hover { background: #e0e0e0; }
-        .logout-btn { background: transparent; color: #999; font-size: 12px; margin-top: 10px; }
+        :root {
+            --color-start: #4a90a4;
+            --color-green: #43b05c;
+            --color-yellow: #f9d342;
+            --color-orange: #ff7e29;
+            --grad-full: linear-gradient(90deg, var(--color-start), var(--color-green), var(--color-yellow), var(--color-orange));
+            --grad-circle: linear-gradient(135deg, var(--color-start), var(--color-green), var(--color-yellow), var(--color-orange));
+            --bg-grad-body: linear-gradient(135deg, #d0e4ff, #b8d4ff, #9fc5ff);
+            --text-dark: #2d3748;
+            --text-light: #5a6574;
+            --border: rgba(255, 255, 255, 0.35);
+        }
+
+        body {
+            background: var(--bg-grad-body);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            width: 100%;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--grad-circle);
+        }
+        .logo-text {
+            font-size: 18px;
+            background: var(--grad-full);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--grad-full);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+        .user-name {
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .form-wrap {
+            max-width: 400px;
+            margin: 4rem auto;
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 80, 200, 0.15);
+        }
+        .form-title {
+            font-size: 20px;
+            margin-bottom: 1.8rem;
+            background: var(--grad-full);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .form-item {
+            margin-bottom: 1.2rem;
+        }
+        .form-item label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+        .form-item input,
+        .form-item textarea,
+        .form-item select {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+        }
+        .form-item textarea {
+            height: 100px;
+            padding-top: 10px;
+            resize: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            background: var(--grad-full);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .btn-default {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        .btn-add-proj {
+            background: var(--grad-full);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .proj-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .proj-card {
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(18px) saturate(190%);
+            -webkit-backdrop-filter: blur(18px) saturate(190%);
+            padding: 1.6rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 24px rgba(0, 70, 180, 0.12);
+        }
+        .proj-card:hover {
+            box-shadow: 0 10px 36px rgba(0, 60, 160, 0.18);
+        }
+        .proj-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            background: var(--grad-full);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .proj-card p {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .content-item {
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(18px) saturate(190%);
+            -webkit-backdrop-filter: blur(18px) saturate(190%);
+            padding: 1.2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+            box-shadow: 0 6px 24px rgba(0, 70, 180, 0.12);
+        }
+        .content-item h4 {
+            font-size: 15px;
+            margin-bottom: 6px;
+            background: var(--grad-full);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .content-item p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        .content-item a {
+            color: #2468d8;
+            text-decoration: none;
+        }
+
+        .publish-box {
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 80, 200, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .top-nav { padding: 0 1rem; }
+            .container { padding: 0 1rem; }
+            .proj-grid { grid-template-columns: 1fr; }
+            .user-name { display: none; }
+        }
     </style>
 </head>
 <body>
-
-    <div class="app-container">
-        <div class="logo-section">
+    <header class="top-nav">
+        <div class="nav-left">
             <div class="logo-circle"></div>
             <div class="logo-text">Lan-niTime</div>
         </div>
-
-        <!-- 1. 登录/注册界面 -->
-        <div id="auth-screen" class="auth-card">
-            <h2 id="form-title" style="margin-top:0;">欢迎回来</h2>
-            <input type="text" id="username" placeholder="用户名" />
-            <input type="password" id="password" placeholder="密码" />
-            <button onclick="handleLogin()" id="submit-btn">登录</button>
-            <div class="toggle-link" onclick="toggleMode()"><span id="toggle-text">还没有账号？点击注册</span></div>
+        <div class="nav-right" id="userNav">
+            <button class="btn-default" onclick="showPage('loginPage')">登录</button>
         </div>
+    </header>
 
-        <!-- 2. 官方专属：二次加密验证框 -->
-        <div id="secondary-auth" class="auth-card" style="display:none; border: 2px solid #f3904f;">
-            <h2 style="color:#f3904f; margin-top:0;">官方二次加密验证</h2>
-            <p style="font-size:13px; color:#666;">检测到官方账号，请输入服务器下发的动态口令</p>
-            <input type="text" id="dynamic-token-input" placeholder="输入动态口令" />
-            <button class="admin-btn orange" onclick="verifySecondaryAuth()">验证并进入后台</button>
-        </div>
-
-        <!-- 3. 主应用界面（包含你的三大项目） -->
-        <div id="main-app">
-            
-            <!-- 项目 1: Jubilee Proclamation (官方发视频) -->
-            <div class="project-card">
-                <div class="project-title">Jubilee Proclamation</div>
-                <div id="jp-content" class="content-area">
-                    <p style="color:#999; font-style:italic;">暂无官方视频发布。</p>
+    <div class="container">
+        <div id="loginPage" class="page active">
+            <div class="form-wrap">
+                <h2 class="form-title">账号登录</h2>
+                <div class="form-item">
+                    <label>用户名</label>
+                    <input type="text" id="loginUser" placeholder="请输入用户名">
                 </div>
-                <!-- 官方专属：发视频 -->
-                <div class="admin-controls">
-                    <input type="text" id="jp-video-title" placeholder="输入视频标题" />
-                    <input type="text" id="jp-video-url" placeholder="输入视频嵌入链接 (iframe src)" />
-                    <button class="admin-btn" onclick="postVideo()">发布视频</button>
+                <div class="form-item">
+                    <label>密码</label>
+                    <input type="password" id="loginPwd" placeholder="请输入密码">
+                </div>
+                <button class="btn-primary" onclick="login()">登录</button>
+                <div style="margin-top:1rem;text-align:center;font-size:13px;">
+                    没有账号？<a href="#" onclick="showPage('regPage')">立即注册</a>
                 </div>
             </div>
-
-            <!-- 项目 2: Axio for Old Phone (官方写内容/自动识别网址) -->
-            <div class="project-card">
-                <div class="project-title">Axio for Old Phone</div>
-                <div id="axio-content" class="content-area">
-                    <p style="color:#999; font-style:italic;">暂无官方内容。</p>
-                </div>
-                <!-- 官方专属：编辑内容 -->
-                <div class="admin-controls">
-                    <textarea id="axio-text-input" rows="3" placeholder="输入内容 (如果输入的是网址会自动变链接)"></textarea>
-                    <button class="admin-btn" onclick="postAxioContent()">发布/更新内容</button>
-                </div>
-            </div>
-
-            <!-- 项目 3: Lan-Store (官方添加下载链接) -->
-            <div class="project-card">
-                <div class="project-title">Lan-Store</div>
-                <div id="store-content" class="content-area">
-                    <p style="color:#999; font-style:italic;">暂无下载资源。</p>
-                </div>
-                <!-- 官方专属：添加下载 -->
-                <div class="admin-controls">
-                    <input type="text" id="store-link-name" placeholder="软件/资源名称" />
-                    <input type="text" id="store-link-url" placeholder="下载链接 (http://...)" />
-                    <button class="admin-btn" onclick="addDownloadLink()">添加下载链接</button>
-                </div>
-            </div>
-
-            <button class="logout-btn" onclick="logout()">退出登录</button>
         </div>
+
+        <div id="regPage" class="page">
+            <div class="form-wrap">
+                <h2 class="form-title">账号注册</h2>
+                <div class="form-item">
+                    <label>用户名</label>
+                    <input type="text" id="regUser" placeholder="设置用户名">
+                </div>
+                <div class="form-item">
+                    <label>密码</label>
+                    <input type="password" id="regPwd" placeholder="设置密码">
+                </div>
+                <div class="form-item">
+                    <label>确认密码</label>
+                    <input type="password" id="regPwd2" placeholder="再次输入密码">
+                </div>
+                <button class="btn-primary" onclick="register()">注册</button>
+                <div style="margin-top:1rem;text-align:center;font-size:13px;">
+                    已有账号？<a href="#" onclick="showPage('loginPage')">返回登录</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="homePage" class="page">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h2 style="font-size:20px;background:var(--grad-full);-webkit-background-clip:text;background-clip:text;color:transparent;">项目列表</h2>
+                <button class="btn-add-proj" id="addProjBtn" onclick="showPage('newProjPage')">+ 新增项目</button>
+            </div>
+            <div class="proj-grid" id="projContainer"></div>
+        </div>
+
+        <div id="newProjPage" class="page">
+            <div class="form-wrap">
+                <h2 class="form-title">新建项目</h2>
+                <div class="form-item">
+                    <label>项目名称</label>
+                    <input type="text" id="newProjName" placeholder="输入项目名">
+                </div>
+                <div class="form-item">
+                    <label>项目描述</label>
+                    <input type="text" id="newProjDesc" placeholder="简单描述">
+                </div>
+                <div class="form-item">
+                    <label>项目类型</label>
+                    <select id="newProjType">
+                        <option value="video">视频发布项目</option>
+                        <option value="text">文字内容项目</option>
+                        <option value="store">下载链接项目</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="createProj()">创建项目</button>
+                <div style="margin-top:1rem;text-align:center">
+                    <button class="btn-default" onclick="showPage('homePage')">返回</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="dynPageBox"></div>
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000/api'; // 后端接口地址
-        let currentUser = {}; 
-        let isLoginMode = true;
+        // 后端服务器地址
+        const baseUrl = "http://localhost:3000/api";
+        let currentUser = null;
 
-        // 切换 登录/注册 模式
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('form-title').innerText = isLoginMode ? '欢迎回来' : '注册新账号';
-            document.getElementById('submit-btn').innerText = isLoginMode ? '登录' : '注册';
-            document.getElementById('toggle-text').innerText = isLoginMode ? '还没有账号？点击注册' : '已有账号？点击登录';
+        // 页面切换
+        function showPage(id){
+            document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+            document.getElementById(id).classList.add("active");
         }
 
         // 注册
-        async function handleRegister() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if(!username || !password) return alert("请输入用户名和密码");
-            const res = await fetch(`${API_URL}/register`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
-            alert(data.message);
+        async function register(){
+            let username = document.getElementById("regUser").value.trim();
+            let password = document.getElementById("regPwd").value.trim();
+            let pwd2 = document.getElementById("regPwd2").value.trim();
+
+            if(!username || !password) return alert("请填写完整");
+            if(password !== pwd2) return alert("两次密码不一致");
+
+            let res = await axios.post(baseUrl + "/register", {username,password});
+            if(res.data.code === 1){
+                alert("注册成功，请登录");
+                showPage("loginPage");
+            }else{
+                alert(res.data.msg);
+            }
         }
 
-        // 登录（第一层）
-        async function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if(!username || !password) return alert("请输入用户名和密码");
-            
-            const res = await fetch(`${API_URL}/login`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
+        // 登录
+        async function login(){
+            let username = document.getElementById("loginUser").value.trim();
+            let password = document.getElementById("loginPwd").value.trim();
 
-            if (data.success) {
-                currentUser = { username, password };
-                if (data.needSecondaryAuth) {
-                    // 官方账号：进入二次加密验证界面
-                    document.getElementById('auth-screen').style.display = 'none';
-                    document.getElementById('secondary-auth').style.display = 'block';
-                } else {
-                    // 普通用户：直接进入主界面，但隐藏所有编辑按钮
-                    enterMainApp(false);
+            if(!username || !password) return alert("请填写完整");
+
+            let res = await axios.post(baseUrl + "/login", {username,password});
+            if(res.data.code === 1){
+                currentUser = res.data.data;
+                renderUserNav();
+                showPage("homePage");
+                loadProjects();
+            }else{
+                alert(res.data.msg);
+            }
+        }
+
+        // 退出登录
+        function logout(){
+            currentUser = null;
+            document.getElementById("userNav").innerHTML = `<button class="btn-default" onclick="showPage('loginPage')">登录</button>`;
+            showPage("loginPage");
+        }
+
+        // 渲染导航用户栏
+        function renderUserNav(){
+            let html = `
+                <div class="user-avatar">${currentUser.username.slice(0,2).toUpperCase()}</div>
+                <span class="user-name">${currentUser.username}</span>
+                <button class="btn-default" onclick="logout()">退出</button>
+            `;
+            document.getElementById("userNav").innerHTML = html;
+            document.getElementById("addProjBtn").style.display = "inline-block";
+        }
+
+        // 加载所有项目（从云端读取）
+        async function loadProjects(){
+            let res = await axios.get(baseUrl + "/projects");
+            let list = res.data.data;
+            let box = document.getElementById("projContainer");
+            box.innerHTML = "";
+
+            list.forEach(item=>{
+                let card = document.createElement("div");
+                card.className = "proj-card";
+                card.onclick = ()=>openProject(item.id, item.type);
+                card.innerHTML = `
+                    <h3>${item.name}</h3>
+                    <p>${item.desc || "暂无描述"}</p>
+                `;
+                box.appendChild(card);
+            });
+        }
+
+        // 新建项目（提交到云端数据库）
+        async function createProj(){
+            let name = document.getElementById("newProjName").value.trim();
+            let desc = document.getElementById("newProjDesc").value.trim();
+            let type = document.getElementById("newProjType").value;
+
+            if(!name) return alert("请输入项目名称");
+
+            await axios.post(baseUrl + "/project/add", {name,desc,type});
+            alert("创建成功");
+            showPage("homePage");
+            loadProjects();
+        }
+
+        // 打开项目，加载对应内容
+        async function openProject(pid, type){
+            let res = await axios.get(baseUrl + "/contents/" + pid);
+            let list = res.data.data;
+
+            let head = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
+                    <h2 style="font-size:20px;background:var(--grad-full);-webkit-background-clip:text;background-clip:text;color:transparent;">项目内容管理</h2>
+                    <button class="btn-default" onclick="showPage('homePage')">返回首页</button>
+                </div>
+            `;
+
+            let publishHtml = "";
+            if(type === "video"){
+                publishHtml = `
+                <div class="publish-box">
+                    <div class="form-item">
+                        <label>视频标题</label>
+                        <input type="text" id="in_vtitle" placeholder="填写标题">
+                    </div>
+                    <div class="form-item">
+                        <label>视频链接</label>
+                        <input type="text" id="in_vurl" placeholder="粘贴视频地址">
+                    </div>
+                    <button class="btn-primary" onclick="addVideoContent(${pid})">发布视频</button>
+                </div>
+                `;
+            }
+            if(type === "text"){
+                publishHtml = `
+                <div class="publish-box">
+                    <div class="form-item">
+                        <label>内容标题</label>
+                        <input type="text" id="in_ttitle" placeholder="填写标题">
+                    </div>
+                    <div class="form-item">
+                        <label>正文内容</label>
+                        <textarea id="in_tcont"></textarea>
+                    </div>
+                    <button class="btn-primary" onclick="addTextContent(${pid})">发布内容</button>
+                </div>
+                `;
+            }
+            if(type === "store"){
+                publishHtml = `
+                <div class="publish-box">
+                    <div class="form-item">
+                        <label>资源名称</label>
+                        <input type="text" id="in_sname" placeholder="文件名">
+                    </div>
+                    <div class="form-item">
+                        <label>下载链接</label>
+                        <input type="text" id="in_surl" placeholder="资源地址">
+                    </div>
+                    <button class="btn-primary" onclick="addStoreContent(${pid})">添加链接</button>
+                </div>
+                `;
+            }
+
+            let listHtml = `<div class="list-wrap">`;
+            list.forEach(d=>{
+                if(type==="video"){
+                    listHtml += `
+                    <div class="content-item">
+                        <h4>${d.title}</h4>
+                        <p><a href="${d.url}" target="_blank">打开视频链接</a></p>
+                    </div>
+                    `;
                 }
-            } else {
-                alert(data.message);
-            }
-        }
-
-        // 官方二次验证（第二层）
-        async function verifySecondaryAuth() {
-            const inputToken = document.getElementById('dynamic-token-input').value;
-            const res = await fetch(`${API_URL}/get-dynamic-token`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(currentUser)
+                if(type==="text"){
+                    let cont = (d.content||"").replace(/(https?:\/\/\S+)/g,'<a href="$1" target="_blank">$1</a>');
+                    listHtml += `
+                    <div class="content-item">
+                        <h4>${d.title}</h4>
+                        <p>${cont}</p>
+                    </div>
+                    `;
+                }
+                if(type==="store"){
+                    listHtml += `
+                    <div class="content-item">
+                        <h4>${d.title}</h4>
+                        <p><a href="${d.url}" target="_blank">立即下载</a></p>
+                    </div>
+                    `;
+                }
             });
-            const data = await res.json();
+            listHtml += `</div>`;
 
-            if (data.success && inputToken === data.token) {
-                // 验证通过，进入主界面，并显示所有官方编辑按钮
-                enterMainApp(true);
-            } else {
-                alert('动态口令错误或已失效！');
-            }
+            let pageDom = document.createElement("div");
+            pageDom.className = "page active";
+            pageDom.innerHTML = head + publishHtml + listHtml;
+
+            document.getElementById("dynPageBox").innerHTML = "";
+            document.getElementById("dynPageBox").appendChild(pageDom);
+            showPage("dynPageBox");
         }
 
-        // 进入主界面并加载数据
-        function enterMainApp(isOfficial) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('secondary-auth').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            
-            // 如果是官方，显示所有 .admin-controls；如果是普通人，全部隐藏
-            document.querySelectorAll('.admin-controls').forEach(el => {
-                el.style.display = isOfficial ? 'block' : 'none';
-            });
-
-            loadProjectData(); // 加载三个项目的真实数据
+        // 新增各类内容 提交云端
+        async function addVideoContent(pid){
+            let title = document.getElementById("in_vtitle").value.trim();
+            let url = document.getElementById("in_vurl").value.trim();
+            if(!title||!url) return alert("请填写完整");
+            await axios.post(baseUrl + "/content/add", {pid,title,url,content:""});
+            openProject(pid,"video");
         }
-
-        function logout() {
-            currentUser = {};
-            document.getElementById('main-app').style.display = 'none';
-            document.getElementById('auth-screen').style.display = 'block';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+        async function addTextContent(pid){
+            let title = document.getElementById("in_ttitle").value.trim();
+            let content = document.getElementById("in_tcont").value.trim();
+            if(!title||!content) return alert("请填写完整");
+            await axios.post(baseUrl + "/content/add", {pid,title,content,url:""});
+            openProject(pid,"text");
         }
-
-        // ================= 项目功能与后端交互 =================
-
-        // 加载三个项目的数据
-        async function loadProjectData() {
-            const res = await fetch(`${API_URL}/get-data`);
-            const data = await res.json();
-            
-            // 渲染 Jubilee Proclamation 视频
-            const jpContainer = document.getElementById('jp-content');
-            if (data.jpVideos && data.jpVideos.length > 0) {
-                jpContainer.innerHTML = data.jpVideos.map(v => `
-                    <div class="video-item">
-                        <div class="video-title">${v.title}</div>
-                        <div class="video-container"><iframe src="${v.url}" allowfullscreen></iframe></div>
-                    </div>`).join('');
-            }
-
-            // 渲染 Axio 内容 (自动识别网址)
-            const axioContainer = document.getElementById('axio-content');
-            if (data.axioContent) {
-                let html = data.axioContent.replace(/(https?:\/\/[^\s]+)/g, url => `<a href="${url}" target="_blank" style="color:#43cea2;">[点击访问] ${url}</a>`);
-                axioContainer.innerHTML = html;
-            }
-
-            // 渲染 Lan-Store 下载链接
-            const storeContainer = document.getElementById('store-content');
-            if (data.storeLinks && data.storeLinks.length > 0) {
-                storeContainer.innerHTML = data.storeLinks.map(l => `<a href="${l.url}" class="link-tag" target="_blank">📥 下载: ${l.name}</a>`).join('');
-            }
+        async function addStoreContent(pid){
+            let title = document.getElementById("in_sname").value.trim();
+            let url = document.getElementById("in_surl").value.trim();
+            if(!title||!url) return alert("请填写完整");
+            await axios.post(baseUrl + "/content/add", {pid,title,url,content:""});
+            openProject(pid,"store");
         }
-
-        // 官方功能：发布视频
-        async function postVideo() {
-            const title = document.getElementById('jp-video-title').value;
-            const url = document.getElementById('jp-video-url').value;
-            if(!title || !url) return alert("请填写完整");
-            await fetch(`${API_URL}/update-data`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ type: 'jpVideos', data: { title, url } })
-            });
-            document.getElementById('jp-video-title').value = '';
-            document.getElementById('jp-video-url').value = '';
-            loadProjectData();
-        }
-
-        // 官方功能：发布 Axio 内容
-        async function postAxioContent() {
-            const text = document.getElementById('axio-text-input').value;
-            if(!text) return alert("请输入内容");
-            await fetch(`${API_URL}/update-data`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ type: 'axioContent', data: text })
-            });
-            document.getElementById('axio-text-input').value = '';
-            loadProjectData();
-        }
-
-        // 官方功能：添加下载链接
-        async function addDownloadLink() {
-            const name = document.getElementById('store-link-name').value;
-            const url = document.getElementById('store-link-url').value;
-            if(!name || !url) return alert("请填写完整");
-            await fetch(`${API_URL}/update-data`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ type: 'storeLinks', data: { name, url } })
-            });
-            document.getElementById('store-link-name').value = '';
-            document.getElementById('store-link-url').value = '';
-            loadProjectData();
-     </script>
-
-<!-- 强制结束脚本，开始渲染页面 -->
+    </script>
 </body>
-</html>   }
-    
+</html>
